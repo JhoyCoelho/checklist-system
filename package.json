@@ -1,0 +1,23 @@
+{
+  "name": "checklist-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.13",
+    "puppeteer": "^24.40.0",
+    "ts-node": "^10.9.2"
+  }
+}
