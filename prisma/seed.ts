@@ -1,4 +1,3 @@
-// /prisma/seed.ts
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 
@@ -16,9 +15,24 @@ async function main() {
     }
   });
 
-  console.log("Usuário admin criado");
+  await prisma.checklistTemplate.create({
+    data: {
+      name: "Ferramentas",
+      questions: {
+        create: [
+          { question: "Alicate presente?", type: "CHECKBOX" },
+          { question: "Chave de fenda presente?", type: "CHECKBOX" },
+          { question: "Observações", type: "TEXT" }
+        ]
+      }
+    }
+  });
 }
 
 main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+  .then(() => prisma.$disconnect())
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

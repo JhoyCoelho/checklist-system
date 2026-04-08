@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 64, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/fyber/Documents/provider-projects/checklist-system/src/app/page.tsx"],"sourcesContent":["import { getServerSession } from \"next-auth\";\r\nimport { authOptions } from \"@/lib/auth\";\r\n\r\nexport default async function Home() {\r\n  const session = await getServerSession(authOptions);\r\n\r\n  if (!session) {\r\n    return (\r\n      <div className=\"p-10\">\r\n        <h1>Você não está logado</h1>\r\n        <a href=\"/login\" className=\"text-blue-500\">\r\n          Ir para login\r\n        </a>\r\n      </div>\r\n    );\r\n  }\r\n\r\n  return (\r\n    <div className=\"p-10\">\r\n      <h1>Bem-vindo {session.user?.email}</h1>\r\n    </div>\r\n  );\r\n}"],"names":["Home","session","authOptions","className","href","user","email"],"mappings":";;;;;AAAA;;;;;;;;;AAGe,eAAeA;IAC5B,MAAMC,UAAU,MAAM,IAAA,yJAAgB,EAACC;IAEvC,IAAI,CAACD,SAAS;QACZ,qBACE,8OAAC;YAAIE,WAAU;;8BACb,8OAAC;8BAAG;;;;;;8BACJ,8OAAC;oBAAEC,MAAK;oBAASD,WAAU;8BAAgB;;;;;;;;;;;;IAKjD;IAEA,qBACE,8OAAC;QAAIA,WAAU;kBACb,cAAA,8OAAC;;gBAAG;gBAAWF,QAAQI,IAAI,EAAEC;;;;;;;;;;;;AAGnC"}}]
+}

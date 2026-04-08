@@ -9,12 +9,12 @@ export async function generateChecklistPDFBuffer(html: string) {
 
   await page.setContent(html);
 
-  const pdfBuffer = await page.pdf({
+  const pdf = await page.pdf({
     format: "A4",
     printBackground: true
   });
 
   await browser.close();
 
-  return pdfBuffer;
+  return pdf;
 }

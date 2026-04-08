@@ -8,84 +8,48 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    // 🔒 valida autenticação
     if (!session || !session.user?.id) {
-      return new Response(JSON.stringify({ error: "Não autorizado" }), {
-        status: 401
-      });
+      return new Response("Unauthorized", { status: 401 });
     }
 
     const body = await req.json();
 
-    const { templateId, answers, signature } = body;
-
-    // 📝 cria checklist
     const checklist = await prisma.checklist.create({
       data: {
         userId: session.user.id,
-        templateId
+        templateId: body.templateId
       }
     });
 
-    // 💾 salva respostas
-    const answersFormatted = Object.entries(answers).map(
-      ([questionId, value]) => ({
-        checklistId: checklist.id,
-        questionId,
-        answer: String(value)
-      })
-    );
+    const answers = Object.entries(body.answers).map(([id, value]) => ({
+      checklistId: checklist.id,
+      questionId: id,
+      answer: String(value)
+    }));
 
-    await prisma.checklistAnswer.createMany({
-      data: answersFormatted
-    });
+    await prisma.checklistAnswer.createMany({ data: answers });
 
-    // ✍️ salva assinatura
     await prisma.signature.create({
       data: {
         checklistId: checklist.id,
-        image: signature
+        image: body.signature
       }
     });
 
-    // 🧾 montar HTML do PDF (simples por enquanto)
     const html = `
       <h1>Checklist</h1>
-      <p><strong>ID:</strong> ${checklist.id}</p>
-      <p><strong>Data:</strong> ${new Date().toLocaleString()}</p>
-
-      <h2>Respostas</h2>
-      ${answersFormatted
-        .map(a => `<p><strong>${a.questionId}:</strong> ${a.answer}</p>`)
-        .join("")}
-
-      <h2>Assinatura</h2>
-      <img src="${signature}" width="200"/>
+      ${answers.map(a => `<p>${a.questionId}: ${a.answer}</p>`).join("")}
+      <img src="${body.signature}" width="200"/>
     `;
 
-    // 📄 gerar PDF em memória
-    const pdfBuffer = await generateChecklistPDFBuffer(html);
+    const pdf = await generateChecklistPDFBuffer(html);
 
-    // 📧 enviar e-mail
-    await sendChecklistEmail(
-      "admin@email.com", // ⚠️ depois podemos dinamizar isso
-      pdfBuffer
-    );
+    await sendChecklistEmail(process.env.EMAIL_USER!, pdf);
 
-    // ✅ marcar como concluído
-    await prisma.checklist.update({
-      where: { id: checklist.id },
-      data: { status: "COMPLETED" }
-    });
-
-    return Response.json({ success: true });
+    return Response.json({ ok: true });
 
   } catch (error) {
     console.error(error);
-
-    return new Response(
-      JSON.stringify({ error: "Erro ao processar checklist" }),
-      { status: 500 }
-    );
+    return new Response("Erro interno", { status: 500 });
   }
 }

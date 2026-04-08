@@ -8,16 +8,16 @@ export const transporter = nodemailer.createTransport({
   }
 });
 
-export async function sendChecklistEmail(to: string, pdfBuffer: Buffer) {
+export async function sendChecklistEmail(to: string, pdf: Buffer) {
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
-    subject: "Checklist diário",
-    text: "Segue o checklist em anexo.",
+    subject: "Checklist preenchido",
+    text: "Segue checklist em anexo",
     attachments: [
       {
         filename: "checklist.pdf",
-        content: pdfBuffer
+        content: pdf
       }
     ]
   });
