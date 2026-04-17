@@ -44,7 +44,10 @@ export async function POST(req: Request) {
 
     const pdf = await generateChecklistPDFBuffer(html);
 
-    await sendChecklistEmail(process.env.EMAIL_USER!, pdf);
+    await sendChecklistEmail(
+      process.env.EMAIL_USER!,
+      Buffer.from(pdf)
+    );
 
     return Response.json({ ok: true });
 
