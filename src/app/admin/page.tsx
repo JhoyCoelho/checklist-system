@@ -1,23 +1,30 @@
-// /src/app/admin/page.tsx
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Prisma } from "@prisma/client";
+
+type ChecklistWithRelations = Prisma.ChecklistGetPayload<{
+  include: {
+    user: true;
+    signature: true;
+  };
+}>;
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
 
-  // 🔒 proteção aqui
   if (!session || session.user.role !== "ADMIN") {
     redirect("/login");
   }
 
-  const checklists = await prisma.checklist.findMany({
-    include: {
-      user: true,
-      pdf: true
-    }
-  });
+  const checklists: ChecklistWithRelations[] =
+    await prisma.checklist.findMany({
+      include: {
+        user: true,
+        signature: true
+      }
+    });
 
   return (
     <div>
@@ -26,9 +33,14 @@ export default async function AdminPage() {
       {checklists.map(c => (
         <div key={c.id}>
           <p>{c.user.name}</p>
-          <a href={c.pdf?.url} target="_blank">
-            Ver PDF
-          </a>
+
+          {c.signature && (
+            <img
+              src={c.signature.image}
+              alt="Assinatura"
+              className="w-40 border"
+            />
+          )}
         </div>
       ))}
     </div>
