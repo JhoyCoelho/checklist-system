@@ -10,27 +10,23 @@ export default function LoginPage() {
   async function handleLogin(e: any) {
     e.preventDefault();
 
-    const res = await signIn("credentials", {
+    await signIn("credentials", {
       email,
       password,
-      redirect: false
+      callbackUrl: "/checklist"
     });
-
-    if (res?.error) {
-      alert("Erro ao logar");
-    } else {
-      alert("Login realizado");
-      window.location.href = "/";
-    }
   }
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <form onSubmit={handleLogin} className="flex flex-col gap-4 w-80">
+    <div className="flex h-screen items-center justify-center bg-gray-100">
+      <form onSubmit={handleLogin} className="flex flex-col gap-4 w-80 bg-white p-6 rounded-xl shadow">
+
+        <h1 className="text-xl font-bold text-center">Login</h1>
+
         <input
           type="email"
           placeholder="Email"
-          className="border p-2"
+          className="border p-2 rounded"
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
@@ -38,14 +34,15 @@ export default function LoginPage() {
         <input
           type="password"
           placeholder="Senha"
-          className="border p-2"
+          className="border p-2 rounded"
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
 
-        <button className="bg-black text-white p-2">
+        <button className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
           Entrar
         </button>
+
       </form>
     </div>
   );

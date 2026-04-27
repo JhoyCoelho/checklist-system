@@ -67,8 +67,9 @@ enum Role {
 }
 
 enum QuestionType {
-  CHECKBOX
-  TEXT
+  STATUS        // OK / FALTANDO / DANIFICADO
+  YES_NO        // SIM / NÃO
+  TEXT          // campo livre
 }
 
 enum ChecklistStatus {

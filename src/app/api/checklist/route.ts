@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { generateChecklistPDFBuffer } from "@/lib/pdf";
+import { buildChecklistHTML } from "@/lib/pdf";
 import { sendChecklistEmail } from "@/lib/mail";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -21,13 +22,15 @@ export async function POST(req: Request) {
       }
     });
 
-    const answers = Object.entries(body.answers).map(([id, value]) => ({
-      checklistId: checklist.id,
-      questionId: id,
-      answer: String(value)
-    }));
+    const answersArray = Object.entries(body.answers).map(
+      ([questionId, value]: any) => ({
+        checklistId: checklist.id,
+        questionId,
+        answer: JSON.stringify(value)
+      })
+    );
 
-    await prisma.checklistAnswer.createMany({ data: answers });
+    await prisma.checklistAnswer.createMany({ data: answersArray });
 
     await prisma.signature.create({
       data: {
@@ -36,11 +39,29 @@ export async function POST(req: Request) {
       }
     });
 
-    const html = `
-      <h1>Checklist</h1>
-      ${answers.map(a => `<p>${a.questionId}: ${a.answer}</p>`).join("")}
-      <img src="${body.signature}" width="200"/>
-    `;
+    const questions = await prisma.checklistQuestion.findMany({
+      where: { templateId: body.templateId }
+    });
+
+    const items = Object.entries(body.answers).map(
+      ([questionId, value]: any) => {
+        const question = questions.find(q => q.id === questionId);
+
+        return {
+          question: question?.question || "Pergunta",
+          status: value.status || value.text,
+          observation: value.observation || value.text || "-"
+        };
+      }
+    );
+
+    const html = buildChecklistHTML({
+      user: session.user.name,
+      date: new Date().toLocaleString("pt-BR"),
+      type: "Checklist Técnico",
+      signature: body.signature,
+      items
+    });
 
     const pdf = await generateChecklistPDFBuffer(html);
 

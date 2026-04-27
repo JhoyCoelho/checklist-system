@@ -22,17 +22,17 @@ async function main() {
       name: "Ferramentas",
       questions: {
         create: [
-          { question: "Chave de fenda", type: "CHECKBOX" },
-          { question: "Chave Philips", type: "CHECKBOX" },
-          { question: "Clivador", type: "CHECKBOX" },
-          { question: "Alicate de corte", type: "CHECKBOX" },
-          { question: "Bolsa de ferramentas", type: "CHECKBOX" },
-          { question: "Alicate decapador de fibra", type: "CHECKBOX" },
-          { question: "Decapador de drop", type: "CHECKBOX" },
-          { question: "Power meter", type: "CHECKBOX" },
-          { question: "Caneta VFL", type: "CHECKBOX" },
-          { question: "Lenços para limpeza de fibra", type: "CHECKBOX" },
-          { question: "Dispenser com álcool isopropílico", type: "CHECKBOX" }
+          { question: "Chave de fenda", type: "STATUS" },
+          { question: "Chave Philips", type: "STATUS" },
+          { question: "Clivador", type: "STATUS" },
+          { question: "Alicate de corte", type: "STATUS" },
+          { question: "Bolsa de ferramentas", type: "STATUS" },
+          { question: "Alicate decapador de fibra", type: "STATUS" },
+          { question: "Decapador de drop", type: "STATUS" },
+          { question: "Power meter", type: "STATUS" },
+          { question: "Caneta VFL", type: "STATUS" },
+          { question: "Lenços para limpeza de fibra", type: "STATUS" },
+          { question: "Dispenser com álcool isopropílico", type: "STATUS" }
         ]
       }
     }
@@ -43,11 +43,11 @@ async function main() {
       name: "Veículo",
       questions: {
         create: [
-          { question: "Combustível suficiente", type: "CHECKBOX" },
-          { question: "Pneus em bom estado", type: "CHECKBOX" },
-          { question: "Documentação presente", type: "CHECKBOX" },
-          { question: "Veículo limpo e organizado", type: "CHECKBOX" },
-          { question: "Ferramentas armazenadas corretamente", type: "CHECKBOX" },
+          { question: "Combustível suficiente", type: "YES_NO" },
+          { question: "Pneus em bom estado", type: "YES_NO" },
+          { question: "Documentação presente", type: "YES_NO" },
+          { question: "Veículo limpo e organizado", type: "YES_NO" },
+          { question: "Ferramentas armazenadas corretamente", type: "YES_NO" },
           { question: "Observações gerais", type: "TEXT" }
         ]
       }

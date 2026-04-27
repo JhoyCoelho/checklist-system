@@ -6,8 +6,14 @@ import SignatureCanvas from "react-signature-canvas";
 export default function ChecklistPage() {
   const [templates, setTemplates] = useState<any[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
-  const [answers, setAnswers] = useState<any>({});
 
+  type AnswerType = {
+    status?: string;
+    observation?: string;
+    text?: string;
+  };
+
+  const [answers, setAnswers] = useState<Record<string, AnswerType>>({});
   const sigRef = useRef<any>(null);
 
   useEffect(() => {
@@ -16,13 +22,32 @@ export default function ChecklistPage() {
       .then(setTemplates);
   }, []);
 
+  function setAnswer(questionId: string, data: Partial<AnswerType>) {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: {
+        ...prev[questionId],
+        ...data
+      }
+    }));
+  }
+
   function validate() {
     if (!selectedTemplate) return false;
 
     for (const q of selectedTemplate.questions) {
-      if (q.type === "CHECKBOX" && answers[q.id] === undefined) {
-        alert("Preencha todos os itens!");
-        return false;
+      const ans = answers[q.id];
+
+      if (q.type === "TEXT") {
+        if (!ans?.text) {
+          alert("Preencha todos os campos!");
+          return false;
+        }
+      } else {
+        if (!ans?.status) {
+          alert("Preencha todos os itens!");
+          return false;
+        }
       }
     }
 
@@ -53,7 +78,7 @@ export default function ChecklistPage() {
     if (res.ok) {
       alert("Checklist enviado com sucesso!");
       setAnswers({});
-      sigRef.current.clear();
+      sigRef.current?.clear();
       setSelectedTemplate(null);
     } else {
       alert("Erro ao enviar");
@@ -63,134 +88,146 @@ export default function ChecklistPage() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
 
-      {/* HEADER */}
       <div className="bg-blue-600 text-white p-4 text-center text-xl font-bold shadow">
         Checklist Técnico
       </div>
 
       <div className="flex-1 p-4 max-w-xl w-full mx-auto">
 
-        {/* LISTA DE CHECKLISTS */}
         {!selectedTemplate && (
           <div className="flex flex-col gap-3">
             {templates.map(t => (
               <button
                 key={t.id}
                 onClick={() => setSelectedTemplate(t)}
-                className="bg-white border border-gray-200 p-4 rounded-xl text-left shadow-sm hover:shadow-md transition"
+                className="bg-white border p-4 rounded-xl shadow text-left"
               >
-                <p className="font-semibold text-gray-800 text-lg">
-                  {t.name}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Toque para iniciar
-                </p>
+                <p className="font-semibold">{t.name}</p>
               </button>
             ))}
           </div>
         )}
 
-        {/* CHECKLIST */}
         {selectedTemplate && (
           <div className="flex flex-col gap-4">
 
-            {/* TÍTULO */}
-            <div className="bg-white p-4 rounded-xl shadow-sm">
-              <h2 className="text-lg font-bold text-gray-800">
-                {selectedTemplate.name}
-              </h2>
-            </div>
+            <h2 className="text-lg font-bold">
+              {selectedTemplate.name}
+            </h2>
 
-            {/* QUESTÕES */}
-            <div className="flex flex-col gap-3">
-              {selectedTemplate.questions.map((q: any) => (
-                <div
-                  key={q.id}
-                  className="bg-white p-4 rounded-xl shadow-sm border border-gray-200"
-                >
+            {selectedTemplate.questions.map((q: any) => (
+              <div key={q.id} className="bg-white p-4 rounded-xl shadow">
 
-                  {q.type === "CHECKBOX" && (
-                    <label className="flex items-center gap-4">
-                      <input
-                        type="checkbox"
-                        className="w-6 h-6 accent-blue-600"
-                        onChange={e =>
-                          setAnswers({
-                            ...answers,
-                            [q.id]: e.target.checked
-                          })
-                        }
-                      />
-                      <span className="text-gray-800 text-base font-medium">
-                        {q.question}
-                      </span>
-                    </label>
-                  )}
+                <p className="font-medium mb-2">{q.question}</p>
 
-                  {q.type === "TEXT" && (
-                    <div>
-                      <p className="mb-2 text-gray-700 font-medium">
-                        {q.question}
-                      </p>
-                      <textarea
-                        className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={3}
-                        onChange={e =>
-                          setAnswers({
-                            ...answers,
-                            [q.id]: e.target.value
-                          })
-                        }
-                      />
+                {/* STATUS (Ferramentas) */}
+                {q.type === "STATUS" && (
+                  <>
+                    <div className="flex gap-2 mb-2">
+                      {["OK", "FALTANDO", "DANIFICADO"].map(status => (
+                        <button
+                          key={status}
+                          onClick={() => setAnswer(q.id, { status })}
+                          className={`px-3 py-1 rounded text-white ${
+                            answers[q.id]?.status === status
+                              ? status === "OK"
+                                ? "bg-green-600"
+                                : status === "FALTANDO"
+                                ? "bg-yellow-500"
+                                : "bg-red-600"
+                              : "bg-gray-300 text-gray-700"
+                          }`}
+                        >
+                          {status}
+                        </button>
+                      ))}
                     </div>
-                  )}
 
-                </div>
-              ))}
-            </div>
+                    {answers[q.id]?.status !== "OK" && (
+                      <textarea
+                        placeholder="Observação"
+                        className="w-full border p-2 rounded"
+                        value={answers[q.id]?.observation || ""}
+                        onChange={e =>
+                          setAnswer(q.id, { observation: e.target.value })
+                        }
+                      />
+                    )}
+                  </>
+                )}
+
+                {/* YES / NO (Veículo) */}
+                {q.type === "YES_NO" && (
+                  <>
+                    <div className="flex gap-2 mb-2">
+                      {["SIM", "NÃO"].map(status => (
+                        <button
+                          key={status}
+                          onClick={() => setAnswer(q.id, { status })}
+                          className={`px-3 py-1 rounded text-white ${
+                            answers[q.id]?.status === status
+                              ? status === "SIM"
+                                ? "bg-green-600"
+                                : "bg-red-600"
+                              : "bg-gray-300 text-gray-700"
+                          }`}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+
+                    {answers[q.id]?.status === "NÃO" && (
+                      <textarea
+                        placeholder="Descreva o problema..."
+                        className="w-full border p-2 rounded"
+                        value={answers[q.id]?.observation || ""}
+                        onChange={e =>
+                          setAnswer(q.id, { observation: e.target.value })
+                        }
+                      />
+                    )}
+                  </>
+                )}
+
+                {/* TEXTO LIVRE */}
+                {q.type === "TEXT" && (
+                  <textarea
+                    placeholder="Digite sua resposta..."
+                    className="w-full border p-2 rounded"
+                    value={answers[q.id]?.text || ""}
+                    onChange={e =>
+                      setAnswer(q.id, { text: e.target.value })
+                    }
+                  />
+                )}
+
+              </div>
+            ))}
 
             {/* ASSINATURA */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-              <p className="font-semibold text-gray-800 mb-2">
-                Assinatura do técnico
-              </p>
+            <div className="bg-white p-4 rounded-xl shadow">
+              <p>Assinatura</p>
 
-              <div className="border rounded-lg overflow-hidden bg-white">
-                <SignatureCanvas
-                  penColor="black"
-                  canvasProps={{
-                    className: "w-full h-40"
-                  }}
-                  ref={sigRef}
-                />
-              </div>
+              <SignatureCanvas
+                ref={sigRef}
+                canvasProps={{ className: "w-full h-40 border" }}
+              />
 
               <button
-                onClick={() => sigRef.current.clear()}
-                className="text-sm text-red-500 mt-2"
+                onClick={() => sigRef.current?.clear()}
+                className="mt-2 text-red-500 text-sm"
               >
                 Limpar assinatura
               </button>
             </div>
 
-            {/* BOTÕES */}
-            <div className="flex gap-3 mt-2">
-
-              <button
-                onClick={handleSubmit}
-                className="flex-1 bg-blue-600 text-white p-4 rounded-xl text-lg font-semibold shadow hover:bg-blue-700 transition"
-              >
-                Enviar
-              </button>
-
-              <button
-                onClick={() => setSelectedTemplate(null)}
-                className="flex-1 bg-gray-200 text-gray-700 p-4 rounded-xl text-lg font-semibold"
-              >
-                Voltar
-              </button>
-
-            </div>
+            <button
+              onClick={handleSubmit}
+              className="bg-blue-600 text-white p-3 rounded"
+            >
+              Enviar
+            </button>
 
           </div>
         )}

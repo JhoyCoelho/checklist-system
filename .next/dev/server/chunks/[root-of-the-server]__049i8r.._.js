@@ -52,6 +52,8 @@ const prisma = new __TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f
 return __turbopack_context__.a(async (__turbopack_handle_async_dependencies__, __turbopack_async_result__) => { try {
 
 __turbopack_context__.s([
+    "buildChecklistHTML",
+    ()=>buildChecklistHTML,
     "generateChecklistPDFBuffer",
     ()=>generateChecklistPDFBuffer
 ]);
@@ -61,17 +63,201 @@ var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
 ]);
 [__TURBOPACK__imported__module__$5b$externals$5d2f$puppeteer__$5b$external$5d$__$28$puppeteer$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$puppeteer$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
 ;
+function buildChecklistHTML(data) {
+    const statusColor = (status)=>{
+        if (status === "OK") return "#16a34a";
+        if (status === "FALTANDO") return "#f59e0b";
+        if (status === "DANIFICADO") return "#dc2626";
+        return "#6b7280";
+    };
+    const statusLabel = (status)=>{
+        if (status === "OK") return "OK";
+        if (status === "FALTANDO") return "FALTANDO";
+        if (status === "DANIFICADO") return "DANIFICADO";
+        return status;
+    };
+    return `
+  <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+          color: #1f2937;
+        }
+
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 3px solid #4f46e5;
+          padding-bottom: 10px;
+          margin-bottom: 20px;
+        }
+
+        .logo {
+          height: 50px;
+        }
+
+        .title {
+          font-size: 22px;
+          font-weight: bold;
+          color: #1e3a8a;
+        }
+
+        .info {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+          font-size: 14px;
+          gap: 10px;
+        }
+
+        .card {
+          background: #f9fafb;
+          padding: 10px;
+          border-radius: 8px;
+          width: 100%;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+
+        th {
+          background: #1e3a8a;
+          color: white;
+          padding: 10px;
+          text-align: left;
+        }
+
+        td {
+          padding: 10px;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .status {
+          font-weight: bold;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 6px;
+          display: inline-block;
+        }
+
+        .footer {
+          margin-top: 40px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+        }
+
+        .signature {
+          margin-top: 10px;
+          border-top: 1px solid #ccc;
+          padding-top: 10px;
+          width: 200px;
+        }
+
+        .signature img {
+          width: 100%;
+        }
+
+        .meta {
+          font-size: 12px;
+          color: #6b7280;
+          margin-top: 20px;
+        }
+
+      </style>
+    </head>
+
+    <body>
+
+      <!-- HEADER -->
+      <div class="header">
+        <img src="../img/logo.png" class="logo"/>
+        <div class="title">CHECKLIST TÉCNICO</div>
+      </div>
+
+      <!-- INFO -->
+      <div class="info">
+        <div class="card">
+          <strong>Técnico:</strong> ${data.user}<br/>
+          <strong>Data:</strong> ${data.date}
+        </div>
+
+        <div class="card">
+          <strong>Tipo:</strong> ${data.type}<br/>
+          <strong>Destino:</strong> Gestão / Supervisão
+        </div>
+      </div>
+
+      <!-- TABELA -->
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50%">Item</th>
+            <th style="width:20%">Status</th>
+            <th style="width:30%">Observação</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${data.items.map((item, index)=>`
+              <tr>
+                <td>${index + 1} - ${item.question}</td>
+                <td>
+                  <span class="status" style="background:${statusColor(item.status)}">
+                    ${statusLabel(item.status)}
+                  </span>
+                </td>
+                <td>${item.observation || "-"}</td>
+              </tr>
+            `).join("")}
+        </tbody>
+      </table>
+
+      <!-- FOOTER -->
+      <div class="footer">
+        <div>
+          <strong>Assinatura do Técnico</strong>
+          <div class="signature">
+            <img src="${data.signature}" />
+          </div>
+        </div>
+      </div>
+
+      <div class="meta">
+        Documento gerado automaticamente pelo sistema Fyberlink
+      </div>
+
+    </body>
+  </html>
+  `;
+}
 async function generateChecklistPDFBuffer(html) {
     const browser = await __TURBOPACK__imported__module__$5b$externals$5d2f$puppeteer__$5b$external$5d$__$28$puppeteer$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$puppeteer$29$__["default"].launch({
+        headless: "new",
         args: [
-            "--no-sandbox"
+            "--no-sandbox",
+            "--disable-setuid-sandbox"
         ]
     });
     const page = await browser.newPage();
-    await page.setContent(html);
+    await page.setContent(html, {
+        waitUntil: "networkidle0"
+    });
     const pdf = await page.pdf({
         format: "A4",
-        printBackground: true
+        printBackground: true,
+        margin: {
+            top: "20px",
+            right: "20px",
+            bottom: "20px",
+            left: "20px"
+        }
     });
     await browser.close();
     return pdf;
@@ -241,7 +427,21 @@ var __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__
 const authOptions = {
     providers: [
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$providers$2f$credentials$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"])({
+            name: "Credentials",
+            credentials: {
+                email: {
+                    label: "Email",
+                    type: "text"
+                },
+                password: {
+                    label: "Password",
+                    type: "password"
+                }
+            },
             async authorize (credentials) {
+                if (!credentials?.email || !credentials?.password) {
+                    return null;
+                }
                 const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].user.findUnique({
                     where: {
                         email: credentials.email
@@ -250,7 +450,12 @@ const authOptions = {
                 if (!user) return null;
                 const valid = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$2c$__$5b$project$5d2f$node_modules$2f$bcrypt$29$__["default"].compare(credentials.password, user.password);
                 if (!valid) return null;
-                return user;
+                return {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                };
             }
         })
     ],
@@ -259,12 +464,16 @@ const authOptions = {
     },
     callbacks: {
         async session ({ session, token }) {
-            session.user.id = token.sub;
-            session.user.role = token.role;
+            if (session.user) {
+                session.user.id = token.sub ?? "";
+                session.user.role = token.role;
+            }
             return session;
         },
         async jwt ({ token, user }) {
-            if (user) token.role = user.role;
+            if (user) {
+                token.role = user.role;
+            }
             return token;
         }
     }
@@ -293,6 +502,7 @@ var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
 ;
 ;
 ;
+;
 async function POST(req) {
     try {
         const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getServerSession"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["authOptions"]);
@@ -302,38 +512,61 @@ async function POST(req) {
             });
         }
         const body = await req.json();
+        // ✅ cria checklist
         const checklist = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].checklist.create({
             data: {
                 userId: session.user.id,
                 templateId: body.templateId
             }
         });
-        const answers = Object.entries(body.answers).map(([id, value])=>({
+        // ✅ salva respostas (JSON com status + observação)
+        const answersArray = Object.entries(body.answers).map(([questionId, value])=>({
                 checklistId: checklist.id,
-                questionId: id,
-                answer: String(value)
+                questionId,
+                answer: JSON.stringify(value)
             }));
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].checklistAnswer.createMany({
-            data: answers
+            data: answersArray
         });
+        // ✅ salva assinatura
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].signature.create({
             data: {
                 checklistId: checklist.id,
                 image: body.signature
             }
         });
-        const html = `
-      <h1>Checklist</h1>
-      ${answers.map((a)=>`<p>${a.questionId}: ${a.answer}</p>`).join("")}
-      <img src="${body.signature}" width="200"/>
-    `;
+        // 🔥 BUSCA AS PERGUNTAS REAIS NO BANCO
+        const questions = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].checklistQuestion.findMany({
+            where: {
+                templateId: body.templateId
+            }
+        });
+        // 🔥 monta dados corretos para o PDF
+        const items = Object.entries(body.answers).map(([questionId, value])=>{
+            const question = questions.find((q)=>q.id === questionId);
+            return {
+                question: question?.question || "Pergunta não encontrada",
+                status: value.status,
+                observation: value.observation
+            };
+        });
+        // 🔥 HTML PROFISSIONAL
+        const html = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$pdf$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["buildChecklistHTML"])({
+            user: session.user.name,
+            date: new Date().toLocaleString("pt-BR"),
+            type: "Checklist Técnico",
+            signature: body.signature,
+            items
+        });
+        // ✅ gera PDF
         const pdf = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$pdf$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["generateChecklistPDFBuffer"])(html);
-        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$mail$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["sendChecklistEmail"])(process.env.EMAIL_USER, pdf);
+        // ✅ envia email
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$mail$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["sendChecklistEmail"])(process.env.EMAIL_USER, Buffer.from(pdf));
         return Response.json({
             ok: true
         });
     } catch (error) {
-        console.error(error);
+        console.error("ERRO AO ENVIAR CHECKLIST:", error);
         return new Response("Erro interno", {
             status: 500
         });
