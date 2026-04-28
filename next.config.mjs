@@ -1,12 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["@sparticuz/chromium"]
-  },
-  webpack: (config) => {
-    config.externals.push("@sparticuz/chromium");
-    return config;
-  }
+  serverExternalPackages: ["@sparticuz/chromium"],
+
+  turbopack: {} // necessário pra evitar conflito com webpack
 };
 
 export default nextConfig;
