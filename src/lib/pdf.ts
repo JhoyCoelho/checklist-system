@@ -1,4 +1,5 @@
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import fs from "fs";
 import path from "path";
 
@@ -190,10 +191,18 @@ export function buildChecklistHTML(data: any) {
 }
 
 // 🔥 GERAÇÃO DO PDF
+// 🔥 GERAÇÃO DO PDF (COMPATÍVEL COM VERCEL)
 export async function generateChecklistPDFBuffer(html: string) {
+  const isDev = process.env.NODE_ENV !== "production";
+
   const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    args: isDev
+      ? []
+      : chromium.args,
+    executablePath: isDev
+      ? undefined // usa chrome local
+      : await chromium.executablePath(),
+    headless: true
   });
 
   const page = await browser.newPage();
