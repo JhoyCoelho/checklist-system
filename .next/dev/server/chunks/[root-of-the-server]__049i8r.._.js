@@ -58,11 +58,18 @@ __turbopack_context__.s([
     ()=>generateChecklistPDFBuffer
 ]);
 var __TURBOPACK__imported__module__$5b$externals$5d2f$puppeteer__$5b$external$5d$__$28$puppeteer$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$puppeteer$29$__ = __turbopack_context__.i("[externals]/puppeteer [external] (puppeteer, esm_import, [project]/node_modules/puppeteer)");
+var __TURBOPACK__imported__module__$5b$externals$5d2f40$sparticuz$2f$chromium__$5b$external$5d$__$2840$sparticuz$2f$chromium$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f40$sparticuz$2f$chromium$29$__ = __turbopack_context__.i("[externals]/@sparticuz/chromium [external] (@sparticuz/chromium, esm_import, [project]/node_modules/@sparticuz/chromium)");
 var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
-    __TURBOPACK__imported__module__$5b$externals$5d2f$puppeteer__$5b$external$5d$__$28$puppeteer$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$puppeteer$29$__
+    __TURBOPACK__imported__module__$5b$externals$5d2f$puppeteer__$5b$external$5d$__$28$puppeteer$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$puppeteer$29$__,
+    __TURBOPACK__imported__module__$5b$externals$5d2f40$sparticuz$2f$chromium__$5b$external$5d$__$2840$sparticuz$2f$chromium$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f40$sparticuz$2f$chromium$29$__
 ]);
-[__TURBOPACK__imported__module__$5b$externals$5d2f$puppeteer__$5b$external$5d$__$28$puppeteer$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$puppeteer$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
+[__TURBOPACK__imported__module__$5b$externals$5d2f$puppeteer__$5b$external$5d$__$28$puppeteer$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$puppeteer$29$__, __TURBOPACK__imported__module__$5b$externals$5d2f40$sparticuz$2f$chromium__$5b$external$5d$__$2840$sparticuz$2f$chromium$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f40$sparticuz$2f$chromium$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
 ;
+;
+function getLogoBase64() {
+    // Hardcoded base64 for production compatibility
+    return "data:image/png;base64,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";
+}
 function buildChecklistHTML(data) {
     const statusColor = (status)=>{
         if (status === "OK") return "#16a34a";
@@ -177,7 +184,7 @@ function buildChecklistHTML(data) {
 
       <!-- HEADER -->
       <div class="header">
-        <img src="../img/logo.png" class="logo"/>
+        <img src="${getLogoBase64()}" class="logo"/>
         <div class="title">CHECKLIST TÉCNICO</div>
       </div>
 
@@ -238,12 +245,12 @@ function buildChecklistHTML(data) {
   `;
 }
 async function generateChecklistPDFBuffer(html) {
+    const isDev = ("TURBOPACK compile-time value", "development") !== "production";
     const browser = await __TURBOPACK__imported__module__$5b$externals$5d2f$puppeteer__$5b$external$5d$__$28$puppeteer$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$puppeteer$29$__["default"].launch({
-        headless: "new",
-        args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox"
-        ]
+        args: ("TURBOPACK compile-time truthy", 1) ? [] : "TURBOPACK unreachable",
+        executablePath: ("TURBOPACK compile-time truthy", 1) ? undefined // usa chrome local
+         : "TURBOPACK unreachable",
+        headless: true
     });
     const page = await browser.newPage();
     await page.setContent(html, {
@@ -450,6 +457,7 @@ const authOptions = {
                 if (!user) return null;
                 const valid = await __TURBOPACK__imported__module__$5b$externals$5d2f$bcrypt__$5b$external$5d$__$28$bcrypt$2c$__cjs$2c$__$5b$project$5d2f$node_modules$2f$bcrypt$29$__["default"].compare(credentials.password, user.password);
                 if (!valid) return null;
+                // 🔥 Retorna o usuário com ID correto
                 return {
                     id: user.id,
                     name: user.name,
@@ -463,18 +471,21 @@ const authOptions = {
         strategy: "jwt"
     },
     callbacks: {
-        async session ({ session, token }) {
-            if (session.user) {
-                session.user.id = token.sub ?? "";
-                session.user.role = token.role;
-            }
-            return session;
-        },
+        // 🔥 Salva dados no token
         async jwt ({ token, user }) {
             if (user) {
+                token.id = user.id;
                 token.role = user.role;
             }
             return token;
+        },
+        // 🔥 Injeta dados na sessão
+        async session ({ session, token }) {
+            if (session.user) {
+                session.user.id = token.id;
+                session.user.role = token.role;
+            }
+            return session;
         }
     }
 };
@@ -504,53 +515,58 @@ var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
 ;
 ;
 async function POST(req) {
+    console.log("Starting checklist submission");
     try {
         const session = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getServerSession"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["authOptions"]);
+        console.log("Session retrieved:", session ? "exists" : "null");
         if (!session || !session.user?.id) {
+            console.error("Unauthorized: no session or user id");
             return new Response("Unauthorized", {
                 status: 401
             });
         }
         const body = await req.json();
-        // ✅ cria checklist
+        console.log("Request body parsed");
+        console.log("Creating checklist in DB");
         const checklist = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].checklist.create({
             data: {
                 userId: session.user.id,
                 templateId: body.templateId
             }
         });
-        // ✅ salva respostas (JSON com status + observação)
+        console.log("Checklist created with id:", checklist.id);
         const answersArray = Object.entries(body.answers).map(([questionId, value])=>({
                 checklistId: checklist.id,
                 questionId,
                 answer: JSON.stringify(value)
             }));
+        console.log("Prepared answers array, length:", answersArray.length);
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].checklistAnswer.createMany({
             data: answersArray
         });
-        // ✅ salva assinatura
+        console.log("Answers saved to DB");
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].signature.create({
             data: {
                 checklistId: checklist.id,
                 image: body.signature
             }
         });
-        // 🔥 BUSCA AS PERGUNTAS REAIS NO BANCO
+        console.log("Signature saved to DB");
         const questions = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].checklistQuestion.findMany({
             where: {
                 templateId: body.templateId
             }
         });
-        // 🔥 monta dados corretos para o PDF
+        console.log("Questions fetched, count:", questions.length);
         const items = Object.entries(body.answers).map(([questionId, value])=>{
             const question = questions.find((q)=>q.id === questionId);
             return {
-                question: question?.question || "Pergunta não encontrada",
-                status: value.status,
-                observation: value.observation
+                question: question?.question || "Pergunta",
+                status: value.status || value.text,
+                observation: value.observation || value.text || "-"
             };
         });
-        // 🔥 HTML PROFISSIONAL
+        console.log("Items prepared for HTML");
         const html = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$pdf$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["buildChecklistHTML"])({
             user: session.user.name,
             date: new Date().toLocaleString("pt-BR"),
@@ -558,15 +574,18 @@ async function POST(req) {
             signature: body.signature,
             items
         });
-        // ✅ gera PDF
+        console.log("HTML built");
+        console.log("Starting PDF generation");
         const pdf = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$pdf$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["generateChecklistPDFBuffer"])(html);
-        // ✅ envia email
+        console.log("PDF generated, size:", pdf.length);
+        console.log("Sending email");
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$mail$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["sendChecklistEmail"])(process.env.EMAIL_USER, Buffer.from(pdf));
+        console.log("Email sent successfully");
         return Response.json({
             ok: true
         });
     } catch (error) {
-        console.error("ERRO AO ENVIAR CHECKLIST:", error);
+        console.error("Error in checklist submission:", error);
         return new Response("Erro interno", {
             status: 500
         });

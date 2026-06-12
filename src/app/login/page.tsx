@@ -1,20 +1,28 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   async function handleLogin(e: any) {
     e.preventDefault();
 
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       email,
       password,
-      callbackUrl: "/checklist"
+      redirect: false
     });
+
+    if (result?.ok) {
+      router.push("/checklist");
+    } else {
+      alert("Email ou senha inválidos");
+    }
   }
 
   return (
