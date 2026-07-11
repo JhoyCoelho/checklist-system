@@ -1,4 +1,5 @@
 import "./globals.css";
+import Providers from "./providers";
 
 export const metadata = {
   title: "Checklist App",
@@ -13,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

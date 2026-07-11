@@ -15,6 +15,8 @@ model User {
   role       Role
   createdAt  DateTime    @default(now())
   checklists Checklist[]
+  justifications Justification[]
+  adminSignatures AdminSignature[]
 }
 
 model ChecklistTemplate {
@@ -43,6 +45,8 @@ model Checklist {
   user       User              @relation(fields: [userId], references: [id])
   answers    ChecklistAnswer[]
   signature  Signature?
+  justification Justification?
+  adminSignature AdminSignature?
 }
 
 model ChecklistAnswer {
@@ -59,6 +63,37 @@ model Signature {
   checklistId String    @unique
   image       String
   checklist   Checklist @relation(fields: [checklistId], references: [id])
+}
+
+model Justification {
+  id             String    @id @default(uuid())
+  checklistId    String?   @unique
+  userId         String
+  role           String
+  checklistType  String
+  expectedDate   DateTime?
+  filledDate     DateTime?
+  expectedTime   String?
+  filledTime     String?
+  reason         String
+  otherReason    String?
+  description    String?
+  signature      String
+  createdAt      DateTime  @default(now())
+
+  checklist      Checklist? @relation(fields: [checklistId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
+}
+
+model AdminSignature {
+  id          String    @id @default(uuid())
+  checklistId String    @unique
+  adminId     String
+  image       String
+  createdAt   DateTime  @default(now())
+
+  checklist   Checklist @relation(fields: [checklistId], references: [id])
+  admin       User      @relation(fields: [adminId], references: [id])
 }
 
 enum Role {

@@ -242,3 +242,98 @@ export async function generateChecklistPDFBuffer(html: string) {
 
   return pdf;
 }
+
+export function buildJustificationHTML(data: any) {
+  const logo = getLogoBase64();
+
+  return `
+  <html>
+    <head>
+      <meta charset="utf-8" />
+      <style>
+        @page { size: A4; margin: 18mm 15mm; }
+        body { font-family: Arial, sans-serif; color: #1f2937; margin: 0; padding: 0; }
+        .page { padding: 18px; box-sizing: border-box; }
+
+        .header { display:flex; align-items:center; gap:12px; border-bottom:4px solid #1e40af; padding-bottom:10px; margin-bottom:18px; }
+        .logo { height:48px; }
+        .header-center { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .title { font-size:20px; font-weight:700; color:#1e3a8a; text-align:center }
+
+        .meta { display:flex; gap:12px; font-size:12px; color:#334155; }
+
+        .info-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:14px; }
+        .card { background:#f8fafc; padding:10px; border-radius:6px; font-size:13px; }
+
+        .section { margin-top:12px; font-size:13px; }
+        .label { font-weight:700; color:#0f172a; }
+
+        .description { background:#fff; border:1px solid #e6eef8; padding:10px; border-radius:6px; min-height:60px; }
+
+        .signatures { display:flex; gap:30px; margin-top:22px; align-items:flex-start; }
+        .sign-block { width:45%; }
+        .sign-label { font-weight:700; margin-bottom:6px; }
+        .signature-box { border-top:1px solid #cbd5e1; padding-top:8px; height:90px; }
+
+        .footer { margin-top:18px; font-size:11px; color:#64748b; }
+
+        /* keep signature and nearby content together on one page */
+        .no-break { page-break-inside: avoid; }
+      </style>
+    </head>
+    <body>
+      <div class="page">
+        <div class="header">
+          <img src="${logo}" class="logo" />
+          <div class="header-center">
+            <div class="title">REGISTRO DE JUSTIFICATIVA DE PREENCHIMENTO FORA DO PRAZO</div>
+            <div class="meta">Documento gerado: ${data.createdAt}</div>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="card"><span class="label">Colaborador:</span> ${data.user}</div>
+          <div class="card"><span class="label">Cargo:</span> ${data.role}</div>
+          <div class="card"><span class="label">Checklist:</span> ${data.checklistType}</div>
+          <div class="card"><span class="label">Motivo:</span> ${data.reason} ${data.otherReason ? ` - ${data.otherReason}` : ''}</div>
+        </div>
+
+        <div class="section">
+          <div style="display:flex; gap:12px">
+            <div class="card" style="flex:1"><span class="label">Data não preenchido:</span><br/>${data.expectedDate || '-'} ${data.expectedTime ? ' - ' + data.expectedTime : ''}</div>
+            <div class="card" style="flex:1"><span class="label">Data do preenchimento (atraso):</span><br/>${data.filledDate || '-'} ${data.filledTime ? ' - ' + data.filledTime : ''}</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="label">Descrição:</div>
+          <div class="description">${data.description || '-'}</div>
+        </div>
+
+        <div class="section no-break">
+          <div>Declaro que esta justificativa tem apenas a finalidade de registrar formalmente o motivo do preenchimento fora do prazo, não substituindo o checklist.</div>
+
+          <div class="signatures">
+            <div class="sign-block">
+              <div class="sign-label">Assinatura do colaborador</div>
+              <div class="signature-box">
+                ${data.signature ? `<img src="${data.signature}" style="max-height:86px; width:auto;"/>` : ''}
+              </div>
+            </div>
+
+            <div class="sign-block">
+              <div class="sign-label">Assinatura do Responsável</div>
+              <div class="signature-box">
+                ${data.adminSignature ? `<img src="${data.adminSignature}" style="max-height:86px; width:auto;"/>` : ''}
+              </div>
+              ${data.adminName ? `<div style="margin-top:8px; font-size:12px; color:#334155;">${data.adminName}</div>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">Documento gerado automaticamente pelo sistema Fyberlink</div>
+      </div>
+    </body>
+  </html>
+  `;
+}

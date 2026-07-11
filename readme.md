@@ -1,128 +1,72 @@
-# 📋 Checklist System
+# Checklist System
 
-Sistema web para criação e execução de checklists com assinatura digital, desenvolvido com foco em técnicos de campo.
+Aplicação web para criação de checklists técnicos com assinatura digital, justificativas de atraso e fluxo de aprovação administrativa.
 
----
+## O que a aplicação faz
 
-## 🚀 Tecnologias utilizadas
+- Cadastro e autenticação de usuários com roles de administrador e técnico
+- Criação de checklists a partir de templates
+- Respostas com status, texto livre e assinatura digital
+- Geração de PDF do checklist
+- Registro de justificativas para preenchimento fora do prazo
+- Aprovação administrativa com assinatura do responsável
+- Envio de e-mails com o resultado do checklist
 
-* Next.js (App Router)
-* React
-* Prisma ORM
-* PostgreSQL (Neon)
-* TailwindCSS
-* Signature Canvas (assinatura digital)
+## Stack
 
----
+- Next.js App Router
+- React
+- Prisma ORM
+- PostgreSQL
+- Tailwind CSS
+- Puppeteer para geração de PDF
+- NextAuth para autenticação
 
-## 📌 Funcionalidades
+## Configuração local
 
-✅ Seleção de templates de checklist
-✅ Respostas com checkbox e texto
-✅ Assinatura digital (canvas)
-✅ Validação obrigatória antes do envio
-✅ Armazenamento no banco de dados
-✅ Preparado para geração de PDF
-
----
-
-## 📷 Preview
-
-*(adicione prints aqui depois se quiser)*
-
----
-
-## ⚙️ Configuração do projeto
-
-### 1. Clonar repositório
-
-```bash
-git clone https://github.com/seu-usuario/checklist-system.git
-cd checklist-system
-```
-
----
-
-### 2. Instalar dependências
+1. Clone o repositório e instale as dependências:
 
 ```bash
 npm install
 ```
 
----
-
-### 3. Configurar variáveis de ambiente
-
-Crie um arquivo `.env` na raiz:
+2. Crie um arquivo `.env` na raiz com as variáveis abaixo:
 
 ```env
-DATABASE_URL="sua_connection_string_do_neon"
-NEXTAUTH_SECRET="seu_segredo"
+DATABASE_URL="sua_connection_string_do_banco"
+NEXTAUTH_SECRET="um_segredo_forte"
 NEXTAUTH_URL="http://localhost:3000"
 
 EMAIL_USER="seu_email"
 EMAIL_PASS="sua_senha_de_app"
 ```
 
----
-
-### 4. Rodar migrações do banco
+3. Execute as migrações do banco:
 
 ```bash
 npx prisma migrate dev
 ```
 
----
-
-### 5. Rodar o projeto
+4. Inicie a aplicação:
 
 ```bash
 npm run dev
 ```
 
-Acesse:
+A aplicação ficará disponível em:
 
-```
+```text
 http://localhost:3000/checklist
 ```
 
----
+## Estrutura principal
 
-## 🧠 Estrutura do projeto
+- `src/app` — páginas, rotas e telas da aplicação
+- `src/lib` — autenticação, e-mail, Prisma e geração de PDF
+- `prisma` — schema e migrações do banco
 
-```
-src/
- ├── app/
- │   ├── api/
- │   ├── checklist/
- │   └── layout.tsx
- ├── lib/
- │   └── prisma.ts
-prisma/
- └── schema.prisma
-```
+## Observações
 
----
-
-## 📄 Futuras melhorias
-
-* 📑 Geração de PDF organizada
-* 📍 Geolocalização do checklist
-* 📷 Upload de fotos
-* ⚠️ Registro de ocorrências (ex: ferramenta perdida)
-* 👤 Autenticação de usuários
-* 📊 Dashboard administrativo
-
----
-
-## 🧠 Observações
-
-* O projeto utiliza TailwindCSS para estilização
-* Banco de dados hospedado no Neon (PostgreSQL serverless)
-* Assinatura é salva como imagem base64
-
----
-
-## 👨‍💻 Autor
-
-Desenvolvido por **Jhoy Coelho**
+- O projeto já inclui os arquivos de migração do Prisma para facilitar a configuração inicial.
+- Os PDFs são gerados automaticamente a partir das respostas e assinaturas do checklist.
+- O fluxo administrativo fica disponível em `/admin` e `/admin/pending`.

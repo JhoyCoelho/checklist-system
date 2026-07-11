@@ -4,13 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --hostname 0.0.0.0",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +22,6 @@
     "nodemailer": "^7.0.13",
     "prisma": "^5.22.0",
     "puppeteer": "^24.40.0",
-    "puppeteer-core": "^24.42.0",
     "react-signature-canvas": "^1.1.0-alpha.2"
   },
   "devDependencies": {
@@ -36,8 +32,6 @@
     "postcss": "^8.5.9",
     "tailwindcss": "^4.2.2",
     "ts-node": "^10.9.2",
-    "tsup": "^8.5.1",
-    "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }
 }

@@ -1,33 +1,25 @@
 import { prisma } from "@/lib/prisma";
-import { generateChecklistPDFBuffer } from "@/lib/pdf";
-import { buildChecklistHTML } from "@/lib/pdf";
+import { generateChecklistPDFBuffer, buildChecklistHTML, buildJustificationHTML } from "@/lib/pdf";
 import { sendChecklistEmail } from "@/lib/mail";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export async function POST(req: Request) {
-  console.log("Starting checklist submission");
-
   try {
     const session = await getServerSession(authOptions);
-    console.log("Session retrieved:", session ? "exists" : "null");
 
     if (!session || !session.user?.id) {
-      console.error("Unauthorized: no session or user id");
-      return new Response("Unauthorized", { status: 401 });
+      return new Response("Não autorizado", { status: 401 });
     }
 
     const body = await req.json();
-    console.log("Request body parsed");
 
-    console.log("Creating checklist in DB");
     const checklist = await prisma.checklist.create({
       data: {
         userId: session.user.id,
         templateId: body.templateId
       }
     });
-    console.log("Checklist created with id:", checklist.id);
 
     const answersArray = Object.entries(body.answers).map(
       ([questionId, value]: any) => ({
@@ -36,10 +28,8 @@ export async function POST(req: Request) {
         answer: JSON.stringify(value)
       })
     );
-    console.log("Prepared answers array, length:", answersArray.length);
 
     await prisma.checklistAnswer.createMany({ data: answersArray });
-    console.log("Answers saved to DB");
 
     await prisma.signature.create({
       data: {
@@ -47,12 +37,18 @@ export async function POST(req: Request) {
         image: body.signature
       }
     });
-    console.log("Signature saved to DB");
+
+    // If a justificationId was provided, link it to this checklist.
+    if (body.justificationId) {
+      await prisma.justification.update({
+        where: { id: body.justificationId },
+        data: { checklistId: checklist.id }
+      });
+    }
 
     const questions = await prisma.checklistQuestion.findMany({
       where: { templateId: body.templateId }
     });
-    console.log("Questions fetched, count:", questions.length);
 
     const items = Object.entries(body.answers).map(
       ([questionId, value]: any) => {
@@ -65,32 +61,56 @@ export async function POST(req: Request) {
         };
       }
     );
-    console.log("Items prepared for HTML");
 
-    const html = buildChecklistHTML({
-      user: session.user.name,
-      date: new Date().toLocaleString("pt-BR"),
-      type: "Checklist Técnico",
-      signature: body.signature,
-      items
-    });
-    console.log("HTML built");
+    const adminSig = await prisma.adminSignature.findUnique({ where: { checklistId: checklist.id } });
+    const shouldSendImmediately = !body.justificationId || Boolean(adminSig);
 
-    console.log("Starting PDF generation");
-    const pdf = await generateChecklistPDFBuffer(html);
-    console.log("PDF generated, size:", pdf.length);
+    if (shouldSendImmediately) {
+      const html = buildChecklistHTML({
+        user: session.user.name,
+        date: new Date().toLocaleString("pt-BR"),
+        type: "Checklist Técnico",
+        signature: body.signature,
+        items
+      });
 
-    console.log("Sending email");
-    await sendChecklistEmail(
-      process.env.EMAIL_USER!,
-      Buffer.from(pdf)
-    );
-    console.log("Email sent successfully");
+      const checklistPdf = await generateChecklistPDFBuffer(html);
+      let attachments: { filename: string; content: Buffer }[] = [];
+      attachments.push({ filename: 'checklist.pdf', content: Buffer.from(checklistPdf) });
 
-    return Response.json({ ok: true });
+      if (body.justificationId) {
+        const justification = await prisma.justification.findFirst({ where: { checklistId: checklist.id } });
+        if (justification) {
+          const jHtml = buildJustificationHTML({
+            user: session.user.name,
+            role: justification.role,
+            checklistType: justification.checklistType,
+            expectedDate: justification.expectedDate?.toLocaleString(),
+            filledDate: justification.filledDate?.toLocaleString(),
+            expectedTime: justification.expectedTime,
+            filledTime: justification.filledTime,
+            reason: justification.reason,
+            otherReason: justification.otherReason,
+            description: justification.description,
+            signature: justification.signature,
+            createdAt: justification.createdAt.toLocaleString('pt-BR')
+          });
+
+          const jPdf = await generateChecklistPDFBuffer(jHtml);
+          attachments.push({ filename: 'justification.pdf', content: Buffer.from(jPdf) });
+        }
+      }
+
+      const technicianName = session.user.name || session.user.email || "técnico";
+      const subject = `Checklist preenchido - ${technicianName}`;
+
+      await sendChecklistEmail(process.env.EMAIL_USER!, attachments, subject);
+      return Response.json({ ok: true, sent: true });
+    }
+
+    return Response.json({ ok: true, pending: true });
 
   } catch (error) {
-    console.error("Error in checklist submission:", error);
-    return new Response("Erro interno", { status: 500 });
+    return new Response("Erro interno do servidor", { status: 500 });
   }
 }

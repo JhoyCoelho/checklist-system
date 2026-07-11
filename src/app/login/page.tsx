@@ -8,9 +8,11 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   async function handleLogin(e: any) {
     e.preventDefault();
+    setError("");
 
     const result = await signIn("credentials", {
       email,
@@ -21,7 +23,10 @@ export default function LoginPage() {
     if (result?.ok) {
       router.push("/checklist");
     } else {
-      alert("Email ou senha inválidos");
+      setError(
+        result?.error ||
+        "Email ou senha inválidos. Verifique os dados e tente novamente."
+      );
     }
   }
 
@@ -31,12 +36,21 @@ export default function LoginPage() {
 
         <h1 className="text-xl font-bold text-center">Login</h1>
 
+        {error && (
+          <p className="text-sm text-red-600 bg-red-100 p-2 rounded">
+            {error}
+          </p>
+        )}
+
         <input
           type="email"
           placeholder="Email"
           className="border p-2 rounded"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={e => {
+            setEmail(e.target.value);
+            setError("");
+          }}
         />
 
         <input
@@ -44,7 +58,10 @@ export default function LoginPage() {
           placeholder="Senha"
           className="border p-2 rounded"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={e => {
+            setPassword(e.target.value);
+            setError("");
+          }}
         />
 
         <button className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">

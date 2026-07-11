@@ -26,23 +26,38 @@ export default async function AdminPage() {
       }
     });
 
+  const pendingCount = await prisma.justification.count({
+    where: { checklistId: { not: null }, checklist: { adminSignature: null } }
+  });
+
   return (
     <div>
-      <h1>Admin</h1>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold">Admin</h1>
 
-      {checklists.map(c => (
-        <div key={c.id}>
-          <p>{c.user.name}</p>
-
-          {c.signature && (
-            <img
-              src={c.signature.image}
-              alt="Assinatura"
-              className="w-40 border"
-            />
-          )}
+        <div className="mt-4">
+          <a href="/admin/pending" className="inline-block bg-red-600 text-white px-4 py-2 rounded">
+            Aguardando confirmação: <span className="font-bold">{pendingCount}</span>
+          </a>
         </div>
-      ))}
+
+        <div className="mt-8">
+          <h2 className="font-semibold">Últimos checklists</h2>
+          {checklists.map(c => (
+            <div key={c.id} className="mt-3 p-3 border rounded">
+              <p className="font-medium">{c.user.name}</p>
+
+              {c.signature && (
+                <img
+                  src={c.signature.image}
+                  alt="Assinatura"
+                  className="w-40 border"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
